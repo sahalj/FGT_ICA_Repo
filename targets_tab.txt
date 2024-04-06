@@ -1,0 +1,7 @@
+"V1"
+"GSM130365"	"wild_type_embryonic_stem cells_biological_rep1"
+"GSM130366"	"wild_type_embryonic_stem cells_biological_rep2"
+"GSM130367"	"wild_type_embryonic_stem cells_biological_rep3"
+"GSM130368"	"HDAC1_knock_out_embryonic_stem_cells_biological_rep1"
+"GSM130369"	"HDAC1_knock_out_embryonic_stem_cells_biological_rep2"
+"GSM130370"	"HDAC1_knock_out_embryonic_stem_cells_biological_rep3"

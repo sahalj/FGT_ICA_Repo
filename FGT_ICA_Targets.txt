@@ -1,0 +1,7 @@
+Name	File Name	Description
+ESC.1	GSM130365.CEL	wild_type_embryonic_stem cells_biological_rep1
+ESC.2	GSM130366.CEL	wild_type_embryonic_stem cells_biological_rep2
+ESC.3	GSM130367.CEL	wild_type_embryonic_stem cells_biological_rep3
+HDAC1.1	GSM130368.CEL	HDAC1_knock_out_embryonic_stem_cells_biological_rep1
+HDAC1.2	GSM130369.CEL	HDAC1_knock_out_embryonic_stem_cells_biological_rep2
+HDAC1.3 	GSM130370.CEL	HDAC1_knock_out_embryonic_stem_cells_biological_rep3

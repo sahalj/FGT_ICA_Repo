@@ -1,0 +1,155 @@
+---
+output:
+  pdf_document: default
+  html_document: default
+---
+```
+title: "Affymetrix Microarray Minimal pipeline"
+author: "Simon Tomlinson 10/02/2021"
+output: html_document
+```
+
+```{r setup, include=FALSE}
+#This is basically the R code from FGT_T3, FGT_T4 and FGT_T5 combined into one script.
+#Running the code in RStudio or MobaXterm is easy-load and run or source the file on one of the servers
+#Modifying the code requires that you understand the R script and the FGT classes!
+#Note that this code often uses the input files directly from /shared_files.  If you do not intend to edit a copy is not needed
+#We do not need to load data between the tutorials - we just use the same data across the whole script
+
+#Problems (features that might be improved)
+#
+#The code has no interactivity or feedback to the user
+#The code has some duplication that could be addressed using a better design!
+#Comments are messy and the code layout is poor in places
+#Note that there are enhancements given in class that are not in the skeleton such as 
+#SimpleAffy, PMA calls, targets file use etc
+#Most of the missing features would results in better outputs and more sustainable code
+#The code will plot figures one after another, OK in RStudio but for SSH sessions they should be saved
+
+#But the skeleton code does run and reproduce the class practical!!
+
+
+
+
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+
+```{r setup, include=FALSE}
+library(limma)
+library(affy)
+library(annotate)
+library(mouse4302.db)# load chip-specific annotation
+
+#install.packages("scatterplot3d",repo="http://cran.ma.imperia#l.ac.uk")
+#Then load the library
+library(scatterplot3d)
+```
+
+```{r}
+library(GEOquery)
+
+# This downloads the supplementary files and sets their location in the filePaths object
+filePaths <- getGEOSuppFiles("GSE5583")
+filePaths <- filePaths[grep("\\.CEL", filePaths)] # Filter only .CEL files
+filePaths
+
+# Create a directory to store the downloaded files
+dir.create("./GSE5583")
+setwd("./GSE5583")
+
+# Download and unzip the files
+for (file in filePaths) {
+  download.file(file, basename(file))
+  unzip(basename(file))
+}
+
+# Return to the original working directory
+setwd("..")
+
+# Grap all the data as an ExpresssionSet object
+# Actually this is a list of objects(to support multiple data sets being returned)
+# Here we just use the first element of this list (since we know to expect a single match)
+gds <- getGEO('GSE5583', destdir="./GSE5583")
+gds <- gds[[1]]
+gds
+
+# Access the required information from the ExpressionSet object gds
+# Stored in the phenotypic data slot of the object
+# Access using accessor function phenoData
+phenoData(gds)
+phenoData(gds)$title
+rownames(phenoData(gds))
+
+# Build the final table from the data extracted from the GDS object
+targets_tab <- as.matrix(pData(phenoData(gds))[,c("title")])
+rownames(targets_tab) <- rownames(pData(phenoData(gds)))
+targets_tab
+write.table(targets_tab, file="targets_tab.txt", sep="\t", col.names=T, row.names=T)
+
+```
+```{r}
+# Load the target file into an AnnotatedDataFrameobject
+adf<-
+read.AnnotatedDataFrame("targets_tab.txt",header=TRUE,row.names=1,as.is=TRUE)
+# Load the expression values of all the CEL files in the targets file
+#mydata <- ReadAffy(filenames=pData(adf)$FileName,phenoData=adf)
+# Or just to quickly load all CEL files in the R working directory
+mydata <- ReadAffy()
+# View a summary of the example data
+mydata
+```
+```{r}
+# Quality control plots
+hist(mydata)
+
+# And a boxplot with different colour per sample group
+colours <- c(rep("yellow",3),rep("red",3))
+
+boxplot(mydata, col=colours, las=2)
+```
+## Normalise the data using RMA
+```{r}
+eset <- rma(mydata)
+eset
+# To obtain a matrix of the expression values, use exprs() 
+values <- exprs(eset)
+
+```
+## Plot Normalised Data
+```{r}
+# Boxplot to observe the results of normalisation
+# Notice differences with the boxplot from the raw data
+boxplot(values, col=colours,las=2)
+
+# MA plot of the samples 1 and 4
+mva.pairs(values[, c(1,4)])
+# The same plot for the non-normalised raw data
+# Note that the mva.pairs call below only plots a few of the  #samples – you may wish to plot them all but this is slow
+mva.pairs(pm(mydata)[, c(1,4)])
+
+```
+
+## Plot Heatmap
+```{r}
+# To facilitate interpretation, let’s replace the columns # # header,currently
+# displaying the filename, to show the name of each sample 
+# (if you have a targets file)
+colnames(values) <- rownames(pData(adf))
+# Performs hierarchical clustering with average linkage based on
+# Pearson’s Correlation Coefficient
+hc<-hclust(as.dist(1-cor(values, method="pearson")), method="average")
+plot(hc)
+```
+## Perform PCA
+
+
+
+```
+
+
+
+
+
+
+
